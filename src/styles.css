@@ -1,0 +1,22 @@
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --accent: #485CC7;
+  --muted: #cfcfe0;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Inter, Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
