@@ -140,6 +140,7 @@ export default function App() {
   const [metaSlippi, setMetaSlippi] = useState('');
   const [metaSmashGG, setMetaSmashGG] = useState('');
   const [metaParryGG, setMetaParryGG] = useState('');
+  const [metaPronouns, setMetaPronouns] = useState('');
   const [metaFirmware, setMetaFirmware] = useState('');
   const [metaAvailable, setMetaAvailable] = useState(false);
   const lastPolledMetaRef = useRef(null);
@@ -440,6 +441,7 @@ export default function App() {
   function applyMetadataToForm(obj) {
     setMetaName(obj.name || '');
     setMetaNametag(obj.nametag || '');
+    setMetaPronouns(obj.pronouns || '');
     setMetaSlippi(obj.slippi || '');
     setMetaSmashGG(obj.smashgg || '');
     setMetaParryGG(obj.parrygg || '');
@@ -493,7 +495,7 @@ export default function App() {
         if (last !== null && JSON.stringify(current) !== JSON.stringify(last)) {
           throw new Error('Metadata changed on controller since last poll — aborting save');
         }
-        const raw = ubjsonEncode({ nametag: metaNametag, name: metaName, slippi: metaSlippi, smashgg: metaSmashGG, parrygg: metaParryGG, firmware: metaFirmware });
+        const raw = ubjsonEncode({ nametag: metaNametag, name: metaName, pronouns: metaPronouns, slippi: metaSlippi, smashgg: metaSmashGG, parrygg: metaParryGG, firmware: metaFirmware });
         if (raw.length > METADATA_MAX_BYTES) {
           throw new Error(`Metadata too large (${raw.length}/${METADATA_MAX_BYTES} B)`);
         }
@@ -509,7 +511,7 @@ export default function App() {
           await joybusTransfer(port, cmd, { maxRespLen: 1, timeoutMs: 500 });
         }
         // Read back from device to confirm the write landed.
-        const intended = { nametag: metaNametag, name: metaName, slippi: metaSlippi, smashgg: metaSmashGG, parrygg: metaParryGG, firmware: metaFirmware };
+        const intended = { nametag: metaNametag, name: metaName, pronouns: metaPronouns, slippi: metaSlippi, smashgg: metaSmashGG, parrygg: metaParryGG, firmware: metaFirmware };
         const readback = await fetchMetadata();
         if (JSON.stringify(readback) !== JSON.stringify(intended)) {
           throw new Error(`Metadata readback mismatch — device has: ${JSON.stringify(readback)}`);
@@ -683,6 +685,8 @@ ${breakdown}`);
             <input style={styles.input} value={metaNametag} onChange={e => setMetaNametag(e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase())} placeholder="ABCD" maxLength={4} disabled={!metaAvailable} />
             <label style={styles.small}>Display Name</label>
             <input style={styles.input} value={metaName} onChange={e => setMetaName(e.target.value)} placeholder="Player tag" disabled={!metaAvailable} />
+            <label style={styles.small}>Pronouns</label>
+            <input style={styles.input} value={metaPronouns} onChange={e => setMetaPronouns(e.target.value)} placeholder="e.g. she/her" disabled={!metaAvailable} />
             <label style={styles.small}>Slippi Code</label>
             <input style={styles.input} value={metaSlippi} onChange={e => setMetaSlippi(e.target.value)} placeholder="ABC#123" disabled={!metaAvailable} />
             <label style={styles.small}>SmashGG</label>
