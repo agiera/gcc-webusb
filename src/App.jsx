@@ -694,7 +694,7 @@ ${breakdown}`);
             <label style={styles.small}>ParryGG</label>
             <input style={styles.input} value={metaParryGG} onChange={e => setMetaParryGG(e.target.value)} placeholder="parry.gg ID" disabled={!metaAvailable} />
             <label style={styles.small}>Firmware</label>
-            <input style={styles.input} value={metaFirmware} onChange={e => setMetaFirmware(e.target.value)} placeholder="e.g. 0.28" disabled={!metaAvailable} />
+            <input style={{ ...styles.input, cursor: 'default' }} value={metaFirmware} onChange={e => setMetaFirmware(e.target.value)} placeholder="e.g. 0.28" disabled />
         </div>
       </div>
 
