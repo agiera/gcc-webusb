@@ -21,6 +21,8 @@ const METADATA_TRANSFER_SIZE = 80;
 const METADATA_MAX_CHUNKS = 8;
 const METADATA_CHUNK_DATA_SIZE = METADATA_TRANSFER_SIZE - 2;
 const METADATA_MAX_BYTES = METADATA_MAX_CHUNKS * METADATA_CHUNK_DATA_SIZE;
+const START_GG_PROFILE_URL = 'https://start.gg/profile';
+const PARRY_GG_PROFILE_URL = 'https://parry.gg/';
 
 // Minimal UBJSON encoder/decoder for flat string-valued objects
 function ubjsonEncode(obj) {
@@ -143,6 +145,10 @@ export default function App() {
   const [metaPronouns, setMetaPronouns] = useState('');
   const [metaFirmware, setMetaFirmware] = useState('');
   const [metaAvailable, setMetaAvailable] = useState(false);
+  const [showSmashGGHelp, setShowSmashGGHelp] = useState(false);
+  const smashGGHelpCloseTimerRef = useRef(null);
+  const [showParryGGHelp, setShowParryGGHelp] = useState(false);
+  const parryGGHelpCloseTimerRef = useRef(null);
   const lastPolledMetaRef = useRef(null);
 
   useEffect(() => {
@@ -195,6 +201,46 @@ export default function App() {
     } catch (e) {}
     setUsbDevice(null);
     addLog('Closed WebUSB');
+  }
+
+  function openStartGGProfile() {
+    window.open(START_GG_PROFILE_URL, '_blank', 'noopener,noreferrer');
+  }
+
+  function openSmashGGHelp() {
+    if (smashGGHelpCloseTimerRef.current) {
+      clearTimeout(smashGGHelpCloseTimerRef.current);
+      smashGGHelpCloseTimerRef.current = null;
+    }
+    setShowSmashGGHelp(true);
+  }
+
+  function closeSmashGGHelpSoon() {
+    if (smashGGHelpCloseTimerRef.current) clearTimeout(smashGGHelpCloseTimerRef.current);
+    smashGGHelpCloseTimerRef.current = setTimeout(() => {
+      setShowSmashGGHelp(false);
+      smashGGHelpCloseTimerRef.current = null;
+    }, 160);
+  }
+
+  function openParryGGProfile() {
+    window.open(PARRY_GG_PROFILE_URL, '_blank', 'noopener,noreferrer');
+  }
+
+  function openParryGGHelp() {
+    if (parryGGHelpCloseTimerRef.current) {
+      clearTimeout(parryGGHelpCloseTimerRef.current);
+      parryGGHelpCloseTimerRef.current = null;
+    }
+    setShowParryGGHelp(true);
+  }
+
+  function closeParryGGHelpSoon() {
+    if (parryGGHelpCloseTimerRef.current) clearTimeout(parryGGHelpCloseTimerRef.current);
+    parryGGHelpCloseTimerRef.current = setTimeout(() => {
+      setShowParryGGHelp(false);
+      parryGGHelpCloseTimerRef.current = null;
+    }, 160);
   }
 
   async function joybusTransfer(port, cmdBytes, { maxRespLen = MAX_RAW_PAYLOAD, timeoutMs = 500 } = {}) {
@@ -689,9 +735,105 @@ ${breakdown}`);
             <input style={styles.input} value={metaPronouns} onChange={e => setMetaPronouns(e.target.value)} placeholder="e.g. she/her" disabled={!metaAvailable} />
             <label style={styles.small}>Slippi Code</label>
             <input style={styles.input} value={metaSlippi} onChange={e => setMetaSlippi(e.target.value)} placeholder="ABC#123" disabled={!metaAvailable} />
-            <label style={styles.small}>SmashGG</label>
-            <input style={styles.input} value={metaSmashGG} onChange={e => setMetaSmashGG(e.target.value)} placeholder="start.gg slug" disabled={!metaAvailable} />
-            <label style={styles.small}>ParryGG</label>
+            <div style={styles.helpLabelRow}>
+              <label style={styles.small}>SmashGG ID</label>
+              <div
+                style={styles.helpWrap}
+                onMouseEnter={openSmashGGHelp}
+                onMouseLeave={closeSmashGGHelpSoon}
+                onFocus={openSmashGGHelp}
+                onBlur={closeSmashGGHelpSoon}
+                onClick={openStartGGProfile}
+              >
+                <button
+                  type="button"
+                  style={styles.helpButton}
+                  aria-label="Open start.gg profile help"
+                  onClick={openStartGGProfile}
+                  onFocus={openSmashGGHelp}
+                >
+                  ?
+                </button>
+                {showSmashGGHelp && (
+                  <div
+                    style={styles.helpTooltip}
+                    role="tooltip"
+                    onMouseEnter={openSmashGGHelp}
+                    onMouseLeave={closeSmashGGHelpSoon}
+                    onClick={openStartGGProfile}
+                  >
+                    <div style={styles.helpTooltipTitle}>Find your start.gg profile id</div>
+                    <div style={styles.helpTooltipText}>
+                      Open your profile page, then copy the id or slug from the profile URL.
+                      The highlighted area below shows where to look.
+                    </div>
+                    <a
+                      href={START_GG_PROFILE_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={styles.helpTooltipLink}
+                    >
+                      Open profile page
+                    </a>
+                    <img
+                      src="./assets/start-gg-profile-page.png"
+                      alt="start.gg profile page with the profile id highlighted"
+                      style={styles.helpTooltipImage}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <input style={styles.input} value={metaSmashGG} onChange={e => setMetaSmashGG(e.target.value)} placeholder="0a76d369" disabled={!metaAvailable} />
+            <div style={styles.helpLabelRow}>
+              <label style={styles.small}>ParryGG ID</label>
+              <div
+                style={styles.helpWrap}
+                onMouseEnter={openParryGGHelp}
+                onMouseLeave={closeParryGGHelpSoon}
+                onFocus={openParryGGHelp}
+                onBlur={closeParryGGHelpSoon}
+                onClick={openParryGGProfile}
+              >
+                <button
+                  type="button"
+                  style={styles.helpButton}
+                  aria-label="Open parry.gg profile help"
+                  onClick={openParryGGProfile}
+                  onFocus={openParryGGHelp}
+                >
+                  ?
+                </button>
+                {showParryGGHelp && (
+                  <div
+                    style={styles.helpTooltip}
+                    role="tooltip"
+                    onMouseEnter={openParryGGHelp}
+                    onMouseLeave={closeParryGGHelpSoon}
+                    onClick={openParryGGProfile}
+                  >
+                    <div style={styles.helpTooltipTitle}>Find your parry.gg id</div>
+                    <div style={styles.helpTooltipText}>
+                      Open your profile page, then copy the id from the profile URL.
+                      Example id: 019c699f-4649-7b31-bc31-c19dda0396f9.
+                    </div>
+                    <a
+                      href={PARRY_GG_PROFILE_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={styles.helpTooltipLink}
+                    >
+                      Open profile page
+                    </a>
+                    <img
+                      src="./assets/parry-gg-profile-page.png"
+                      alt="parry.gg profile page with the profile id highlighted"
+                      style={styles.helpTooltipImage}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
             <input style={styles.input} value={metaParryGG} onChange={e => setMetaParryGG(e.target.value)} placeholder="parry.gg ID" disabled={!metaAvailable} />
             <label style={styles.small}>Firmware</label>
             <input style={{ ...styles.input, cursor: 'default' }} value={metaFirmware} onChange={e => setMetaFirmware(e.target.value)} placeholder="e.g. 0.28" disabled />
@@ -817,6 +959,68 @@ const styles = {
   small: {
     fontSize: 13,
     color: '#cfcfe0',
+  },
+  helpLabelRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 32,
+  },
+  helpWrap: {
+    position: 'relative',
+    display: 'inline-flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+  },
+  helpButton: {
+    width: 20,
+    height: 20,
+    borderRadius: '50%',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    background: '#101010',
+    color: '#cfcfe0',
+    cursor: 'pointer',
+    padding: 0,
+    lineHeight: '18px',
+    fontSize: 12,
+    fontWeight: 700,
+  },
+  helpTooltip: {
+    position: 'absolute',
+    left: 20,
+    top: 18,
+    zIndex: 20,
+    width: 320,
+    background: '#050505',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.45)',
+    borderRadius: 8,
+    padding: 10,
+    cursor: 'pointer',
+  },
+  helpTooltipTitle: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: '#ffffff',
+    marginBottom: 6,
+  },
+  helpTooltipText: {
+    fontSize: 12,
+    lineHeight: 1.4,
+    color: '#cfcfe0',
+  },
+  helpTooltipLink: {
+    display: 'inline-block',
+    marginTop: 6,
+    color: '#8db4ff',
+    fontSize: 12,
+    textDecoration: 'underline',
+  },
+  helpTooltipImage: {
+    width: '100%',
+    marginTop: 8,
+    borderRadius: 6,
+    display: 'block',
   },
   canvas: {
     background: '#000',
